@@ -1,0 +1,116 @@
+<%- include('./partials/header') %>
+<div class="w-full min-h-screen px-20 py-10">
+    <div class="flex justify-between items-center mb-8">
+        <h2 class="text-3xl font-semibold">My Account</h2>
+        <div class="flex gap-3">
+            <a href="/shop" class="px-5 py-2 bg-blue-500 text-white rounded-full">Continue Shopping</a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Profile Information -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-medium mb-4 text-blue-500">Personal Information</h3>
+            <div class="space-y-3">
+                <p class="flex justify-between">
+                    <span class="text-gray-600">Name:</span>
+                    <span class="font-medium"><%= user.fullname %></span>
+                </p>
+                <p class="flex justify-between">
+                    <span class="text-gray-600">Email:</span>
+                    <span class="font-medium"><%= user.email %></span>
+                </p>
+                <% if (user.contact) { %>
+                <p class="flex justify-between">
+                    <span class="text-gray-600">Contact:</span>
+                    <span class="font-medium"><%= user.contact %></span>
+                </p>
+                <% } %>
+            </div>
+            <div class="mt-6">
+                <button class="px-4 py-2 bg-gray-200 rounded-md text-sm">Edit Information</button>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-medium mb-4 text-blue-500">Shopping Summary</h3>
+            <div class="space-y-3">
+                <p class="flex justify-between">
+                    <span class="text-gray-600">Items in Cart:</span>
+                    <span class="font-medium"><%= user.cart ? user.cart.length : 0 %></span>
+                </p>
+                <p class="flex justify-between">
+                    <span class="text-gray-600">Completed Orders:</span>
+                    <span class="font-medium"><%= user.orders ? user.orders.length : 0 %></span>
+                </p>
+            </div>
+            <div class="mt-6 flex gap-3">
+                <a href="/cart" class="px-4 py-2 bg-blue-500 text-white rounded-md text-sm">View Cart</a>
+            </div>
+        </div>
+
+        <!-- Account Actions -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-medium mb-4 text-blue-500">Account Actions</h3>
+            <div class="space-y-4">
+                <a href="#" class="flex items-center text-gray-700 hover:text-blue-500">
+                    <i class="ri-lock-line mr-2"></i>
+                    <span>Change Password</span>
+                </a>
+                <a href="#" class="flex items-center text-gray-700 hover:text-blue-500">
+                    <i class="ri-map-pin-line mr-2"></i>
+                    <span>Manage Addresses</span>
+                </a>
+                <a href="#" class="flex items-center text-gray-700 hover:text-blue-500">
+                    <i class="ri-heart-line mr-2"></i>
+                    <span>Wishlist</span>
+                </a>
+                <a href="/logout" class="flex items-center text-red-500 hover:text-red-700">
+                    <i class="ri-logout-box-line mr-2"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <% if (user.orders && user.orders.length > 0) { %>
+    <!-- Order History -->
+    <div class="mt-10">
+        <h3 class="text-2xl font-medium mb-6">Order History</h3>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="py-3 px-6 text-left">Order ID</th>
+                        <th class="py-3 px-6 text-left">Date</th>
+                        <th class="py-3 px-6 text-left">Items</th>
+                        <th class="py-3 px-6 text-left">Total</th>
+                        <th class="py-3 px-6 text-left">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% user.orders.forEach(order => { %>
+                    <tr class="border-t border-gray-200">
+                        <td class="py-4 px-6">#<%= order.id %></td>
+                        <td class="py-4 px-6"><%= order.date %></td>
+                        <td class="py-4 px-6"><%= order.items.length %></td>
+                        <td class="py-4 px-6">₹ <%= order.total %></td>
+                        <td class="py-4 px-6">
+                            <span class="px-2 py-1 rounded-full text-xs 
+                            <%= order.status === 'Delivered' ? 'bg-green-100 text-green-800' : 
+                               order.status === 'Processing' ? 'bg-blue-100 text-blue-800' : 
+                               'bg-yellow-100 text-yellow-800' %>">
+                                <%= order.status %>
+                            </span>
+                        </td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <% } %>
+</div>
+
+<%- include('./partials/footer') %>
