@@ -10,6 +10,23 @@
 <body class="font-['helvetica_now_display'] bg-gray-50 min-h-screen flex flex-col">
     <nav class="sticky top-0 z-50 bg-white shadow-md py-4 px-6 flex justify-between items-center">
         <a href="/" class="text-2xl font-bold text-blue-600">Scatch</a>
+        <!-- Search Bar with Integrated Icon -->
+        <div class="relative flex-1 mx-6">
+            <div class="relative flex items-center">
+                <i class="ri-search-line text-lg text-gray-600 absolute left-4"></i>
+                <input 
+                    type="text" 
+                    id="search-bar" 
+                    placeholder="Search products..." 
+                    class="w-full pl-12 pr-4 py-2 border rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out" 
+                    autocomplete="off"
+                />
+            </div>
+            <!-- Suggestions Dropdown -->
+            <div id="search-suggestions" class="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto hidden z-50">
+                <!-- Suggestions will be populated here -->
+            </div>
+        </div>
         <% var loggedIn = typeof loggedIn !== 'undefined' ? loggedIn : true %>
         <% var isOwner = typeof isOwner !== 'undefined' ? isOwner : false %>
         <% if(loggedIn) { %>
@@ -29,3 +46,64 @@
             </div>
         <% } %>
     </nav>
+
+    <!-- JavaScript for Live Search -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchBar = document.getElementById('search-bar');
+            const suggestionsBox = document.getElementById('search-suggestions');
+
+            searchBar.addEventListener('input', async function() {
+                const query = this.value.trim();
+                if (query.length < 2) {
+                    suggestionsBox.classList.add('hidden');
+                    suggestionsBox.innerHTML = '';
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/search?query=${encodeURIComponent(query)}`);
+                    const products = await response.json();
+
+                    suggestionsBox.innerHTML = '';
+                    if (products.length === 0) {
+                        suggestionsBox.innerHTML = '<div class="p-3 text-gray-600">No products found</div>';
+                    } else {
+                        products.forEach(product => {
+                            const suggestionItem = document.createElement('a');
+                            suggestionItem.href = `/shop?search=${encodeURIComponent(product.name)}`;
+                            suggestionItem.className = 'flex items-center p-3 hover:bg-gray-100 transition duration-150 ease-in-out';
+                            suggestionItem.innerHTML = `
+                                <img src="data:image/jpeg;base64,${product.image}" alt="${product.name}" class="w-10 h-10 object-contain mr-3">
+                                <div>
+                                    <p class="text-gray-800 font-medium">${product.name}</p>
+                                    <p class="text-gray-600 text-sm">₹ ${product.price - product.discount}</p>
+                                </div>
+                            `;
+                            suggestionsBox.appendChild(suggestionItem);
+                        });
+                    }
+                    suggestionsBox.classList.remove('hidden');
+                } catch (error) {
+                    console.error('Error fetching search suggestions:', error);
+                    suggestionsBox.classList.add('hidden');
+                }
+            });
+
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchBar.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                    suggestionsBox.classList.add('hidden');
+                }
+            });
+
+            // Show suggestions again when clicking the search bar
+            searchBar.addEventListener('focus', function() {
+                if (this.value.trim().length >= 2) {
+                    suggestionsBox.classList.remove('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
