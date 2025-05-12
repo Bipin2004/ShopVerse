@@ -6,15 +6,10 @@ const isOwner = require('../middlewares/isOwner')
 
 router.post('/create', isLoggedIn, isOwner, async (req, res) => {
     try {
-        console.log('Creating new product');
-        console.log('Request body:', req.body);
-        console.log('Request files:', req.files);
-
         const { name, price, discount, bgcolor, panelcolor, textcolor } = req.body;
 
         // Validate required fields
         if (!name || !price || !discount) {
-            console.log('Validation failed: Missing required fields');
             req.flash('error', 'Name, price, and discount are required');
             return res.redirect('/owners/admin');
         }
@@ -31,19 +26,14 @@ router.post('/create', isLoggedIn, isOwner, async (req, res) => {
 
         // Handle image upload (optional)
         if (req.files && req.files.image && req.files.image.data) {
-            console.log('Image uploaded:', req.files.image);
             productData.image = req.files.image.data;
         } else {
-            console.log('No image uploaded');
-            // Optionally, set a default image or handle the missing image case
-            // For now, we'll throw an error to enforce image upload
             req.flash('error', 'Image is required');
             return res.redirect('/owners/admin');
         }
 
         const product = new productModel(productData);
         await product.save();
-        console.log('Product created successfully:', product);
         req.flash('success', 'Product created successfully');
         res.redirect('/owners/admin');
     } catch (err) {
