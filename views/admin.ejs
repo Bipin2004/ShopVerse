@@ -1,113 +1,73 @@
 <%- include('./partials/header') %>
-    <div class="w-full h-screen flex items-start px-20 py-20">
-        <div class="w-[25%] flex h-screen flex-col items-start">
-            <div class="flex flex-col">
-                <h2 class="font-bold text-xl mb-4">Admin Controls</h2>
-                <a class="block w-fit mb-2" href="#products">Manage Products</a>
-                <a class="block w-fit mb-2" href="#users">Manage Users</a>
-                <a class="block w-fit mb-2" href="">Create new product</a>
+
+<main class="flex-1 py-12 bg-gray-50">
+    <div class="container mx-auto px-6 lg:px-20 flex flex-col lg:flex-row gap-8">
+        <!-- Sidebar -->
+        <div class="w-full lg:w-1/4 bg-white rounded-xl shadow-md p-6 sticky top-24">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Admin Controls</h2>
+            <div class="flex flex-col gap-2">
+                <a href="#products" class="text-gray-700 hover:text-blue-600 transition">Manage Products</a>
+                <a href="#users" class="text-gray-700 hover:text-blue-600 transition">Manage Users</a>
+                <a href="/owners/admin" class="text-gray-700 hover:text-blue-600 transition">Create New Product</a>
             </div>
         </div>
-        <div class="w-[75%] flex flex-col gap-8 h-screen overflow-y-auto">
+        <!-- Content -->
+        <div class="w-full lg:w-3/4">
             <!-- Products Section -->
-            <div id="products" class="w-full">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-semibold">Product Management</h2>
-                    <a class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" href="/admin/add-product">
-                        Add New Product
-                    </a>
+            <div id="products" class="mb-12">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Product Management</h2>
+                    <a href="/owners/admin" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Add New Product</a>
                 </div>
-                
-                <div class="flex flex-wrap items-start gap-5">
-                    </div>
-                </div>
-                <div class="w-60 bg-red-500">
-                    <div class="w-full h-52 bg-yellow-500"></div>
-                    <div class="flex justify-between items-center px-4 py-4">
-                        <div>
-                            <h3>Clinge Bag</h3>
-                            <h4>₹ 1200</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <% products.forEach(function(product) { %>
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:scale-105 transition transform">
+                            <div class="h-48 flex items-center justify-center bg-[<%= product.bgcolor %>]">
+                                <img class="h-40 object-contain" src="data:image/jpeg;base64,<%= product.image.toString('base64') %>" alt="<%= product.name %>">
+                            </div>
+                            <div class="p-4 bg-[<%= product.panelcolor %>] text-[<%= product.textcolor %>]">
+                                <h3 class="text-lg font-semibold truncate"><%= product.name %></h3>
+                                <h4 class="text-base font-medium">₹ <%= product.price - product.discount %></h4>
+                                <div class="flex gap-2 mt-2">
+                                    <a href="#" class="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">Edit</a>
+                                    <a href="#" class="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm">Delete</a>
+                                </div>
+                            </div>
                         </div>
-                        <a class="w-7 h-7 flex items-center justify-center rounded-full bg-white" href="">
-                            <i class="ri-add-line"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="w-60 bg-red-500">
-                    <div class="w-full h-52 bg-yellow-500"></div>
-                    <div class="flex justify-between items-center px-4 py-4">
-                        <div>
-                            <h3>Clinge Bag</h3>
-                            <h4>₹ 1200</h4>
-                        </div>
-                        <a class="w-7 h-7 flex items-center justify-center rounded-full bg-white" href="">
-                            <i class="ri-add-line"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="w-60 bg-red-500">
-                    <div class="w-full h-52 bg-yellow-500"></div>
-                    <div class="flex justify-between items-center px-4 py-4">
-                        <div>
-                            <h3>Clinge Bag</h3>
-                            <h4>₹ 1200</h4>
-                        </div>
-                        <a class="w-7 h-7 flex items-center justify-center rounded-full bg-white" href="">
-                            <i class="ri-add-line"></i>
-                        </a>
-                    </div>
+                    <% }) %>
                 </div>
             </div>
-            <div class="flex items-start gap-5">
-                <div class="w-60 bg-red-500">
-                    <div class="w-full h-52 bg-yellow-500"></div>
-                    <div class="flex justify-between items-center px-4 py-4">
-                        <div>
-                            <h3>Clinge Bag</h3>
-                            <h4>₹ 1200</h4>
-                        </div>
-                        <a class="w-7 h-7 flex items-center justify-center rounded-full bg-white" href="">
-                            <i class="ri-add-line"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="w-60 bg-red-500">
-                    <div class="w-full h-52 bg-yellow-500"></div>
-                    <div class="flex justify-between items-center px-4 py-4">
-                        <div>
-                            <h3>Clinge Bag</h3>
-                            <h4>₹ 1200</h4>
-                        </div>
-                        <a class="w-7 h-7 flex items-center justify-center rounded-full bg-white" href="">
-                            <i class="ri-add-line"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="w-60 bg-red-500">
-                    <div class="w-full h-52 bg-yellow-500"></div>
-                    <div class="flex justify-between items-center px-4 py-4">
-                        <div>
-                            <h3>Clinge Bag</h3>
-                            <h4>₹ 1200</h4>
-                        </div>
-                        <a class="w-7 h-7 flex items-center justify-center rounded-full bg-white" href="">
-                            <i class="ri-add-line"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="w-60 bg-red-500">
-                    <div class="w-full h-52 bg-yellow-500"></div>
-                    <div class="flex justify-between items-center px-4 py-4">
-                        <div>
-                            <h3>Clinge Bag</h3>
-                            <h4>₹ 1200</h4>
-                        </div>
-                        <a class="w-7 h-7 flex items-center justify-center rounded-full bg-white" href="">
-                            <i class="ri-add-line"></i>
-                        </a>
-                    </div>
+            <!-- Users Section -->
+            <div id="users">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">User Management</h2>
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="py-4 px-6 text-left text-gray-600">Name</th>
+                                <th class="py-4 px-6 text-left text-gray-600">Email</th>
+                                <th class="py-4 px-6 text-left text-gray-600">Role</th>
+                                <th class="py-4 px-6 text-left text-gray-600">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(user => { %>
+                                <tr class="border-t border-gray-200 hover:bg-gray-50">
+                                    <td class="py-4 px-6"><%= user.fullname %></td>
+                                    <td class="py-4 px-6"><%= user.email %></td>
+                                    <td class="py-4 px-6"><%= user.isOwner ? 'Owner' : 'Customer' %></td>
+                                    <td class="py-4 px-6">
+                                        <a href="#" class="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">Edit</a>
+                                        <a href="#" class="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm">Delete</a>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-    <%- include('./partials/footer') %>
+</main>
+
+<%- include('./partials/footer') %>

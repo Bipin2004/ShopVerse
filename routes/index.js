@@ -4,9 +4,15 @@ const isLoggedIn = require('../middlewares/isLoggedIn')
 const productModel = require('../models/product') // Add product model
 const userModel = require('../models/users') // Add user model
 
-router.get('/',(req,res)=>{
+router.get('/', (req, res) => {
     let error = req.flash('error')
-    res.render('index',{error,loggedIn:false})
+    // Check if user is logged in and pass isOwner if applicable
+    let loggedIn = !!req.cookies.token
+    let isOwner = false
+    if (loggedIn && req.user) {
+        isOwner = req.user.isOwner || false
+    }
+    res.render('index', { error, loggedIn, isOwner })
 })
 
 // Added new profile route
@@ -24,31 +30,45 @@ router.get('/profile', isLoggedIn, async (req, res) => {
     }
 })
 
-router.get('/shop',isLoggedIn, async (req,res)=>{ // If user is logged in then only show the shop page
+router.get('/shop', isLoggedIn, async (req, res) => { // If user is logged in then only show the shop page
     try {
-        // Fetch products from the database
-        const products = await productModel.find({})
-        // Pass the isOwner flag for navbar display
-        const isOwner = req.user.isOwner || false
-        let success = req.flash('success') // Get success message from flash
-        // Render the shop page with products
-        res.render('shop', { products, success, isOwner })
+        // Read query params for sorting and filtering
+        const { sortby, category, filter } = req.query;
+        // Build query object
+        let queryObj = {};
+        if (category === 'discounted' || filter === 'discount') {
+            queryObj.discount = { $gt: 0 };
+        }
+        // Fetch products with filtering
+        const productQuery = productModel.find(queryObj);
+        // Apply sorting
+        if (sortby === 'newest') {
+            productQuery.sort({ _id: -1 });
+        } else if (sortby === 'popular') {
+            productQuery.sort({ discount: -1 });
+        }
+        const products = await productQuery;
+        // Prepare flags and flash
+        const isOwner = req.user.isOwner || false;
+        const success = req.flash('success');
+        // Render shop with additional params
+        res.render('shop', { products, success, isOwner, sortby, category, filter });
     } catch (err) {
         console.error('Error fetching products:', err)
         res.status(500).send('Error loading products')
     }
 })
 
-router.get('/addtocart/:productid',isLoggedIn,async (req,res)=>{
-let user = await userModel.findOne({email:req.user.email}) // Find the user by email
-user.cart.push(req.params.productid) // Add the product id to the user's cart
-await user.save() // Save the user with the updated cart
-req.flash('success','Product added to cart') // Flash success message
-res.redirect('/shop') // Redirect to the shop page
+router.get('/addtocart/:productid', isLoggedIn, async (req, res) => {
+    let user = await userModel.findOne({email: req.user.email}) // Find the user by email
+    user.cart.push(req.params.productid) // Add the product id to the user's cart
+    await user.save() // Save the user with the updated cart
+    req.flash('success', 'Product added to cart') // Flash success message
+    res.redirect('/shop') // Redirect to the shop page
 })
 
-router.get('/cart',isLoggedIn,async (req,res)=>{
-    let user = await userModel.findOne({email:req.user.email}).populate('cart') // Find the user by email and populate the cart with product details
+router.get('/cart', isLoggedIn, async (req, res) => {
+    let user = await userModel.findOne({email: req.user.email}).populate('cart') // Find the user by email and populate the cart with product details
     
     // Calculate total bill by summing up all items in the cart
     let bill = 0;
@@ -62,7 +82,7 @@ router.get('/cart',isLoggedIn,async (req,res)=>{
     
     // Get isOwner flag for navbar display
     const isOwner = req.user.isOwner || false
-    res.render('cart',{user, bill, isOwner}) // Render the cart page with products in the cart
+    res.render('cart', { user, bill, isOwner }) // Render the cart page with products in the cart
 })
 
 // New route to handle cart quantity updates
@@ -105,7 +125,7 @@ router.delete('/remove-from-cart/:productId', isLoggedIn, async (req, res) => {
     }
 });
 
-router.get('/logout',isLoggedIn,(req,res)=>{
+router.get('/logout', isLoggedIn, (req, res) => {
     res.cookie('token', '') // clear the token from cookies
     res.redirect('/') // redirect to home page
 })

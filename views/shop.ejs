@@ -1,13 +1,10 @@
 <%- include('./partials/header') %>
 
-<% if(success.length>0){ %>
-    <div class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-blue-500 flash-message">
-        <span class="inline-block mt-1 mb-1 text-white">
-            <%= success %>
-        </span>
+<% if(success.length > 0) { %>
+    <div class="fixed top-20 left-1/2 transform -translate-x-1/2 p-4 rounded-lg bg-green-500 text-white shadow-lg z-50 flash-message">
+        <span><%= success %></span>
     </div>
     <script>
-        // Make the flash message disappear after 4 seconds
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() {
                 const flashMessage = document.querySelector('.flash-message');
@@ -18,57 +15,124 @@
                         flashMessage.remove();
                     }, 500);
                 }
-            }, 4000); // 4 seconds
+            }, 4000);
         });
     </script>
 <% } %>
-    
-    <div class="w-full h-screen flex items-start px-20 py-20">
-        <div class="w-[25%] flex h-screen flex-col items-start">
-            <div class="flex items-center gap-2">
-                <h3>sort by</h3>
-                <form action="/shop">
-                    <select class="border-[1px] px-2 py-1" name="sortby" id="">
-                        <option value="popular">Popular</option>
-                        <option value="newest">Newest</option>
+
+<% // Set defaults for query params %>
+<% sortby = typeof sortby !== 'undefined' ? sortby : 'popular'; %>
+<% category = typeof category !== 'undefined' ? category : ''; %>
+<% filter = typeof filter !== 'undefined' ? filter : ''; %>
+
+<main class="flex-1 py-12 bg-gray-50">
+    <div class="container mx-auto px-6 lg:px-20 flex flex-col lg:flex-row gap-8">
+        <!-- Sidebar -->
+        <div class="w-full lg:w-1/4 bg-white rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Filter & Sort</h3>
+            <div class="mb-6">
+                <h4 class="text-sm font-medium text-gray-600 mb-2">Sort By</h4>
+                <form action="/shop" id="sortForm">
+                    <input type="hidden" name="category" value="<%= category %>">
+                    <input type="hidden" name="filter" value="<%= filter %>">
+                    <select name="sortby" class="w-full border rounded-lg px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out" onchange="document.getElementById('sortForm').submit()">
+                        <option value="popular" <%= sortby==='popular'?'selected':'' %>>Popular</option>
+                        <option value="newest" <%= sortby==='newest'?'selected':'' %>>Newest</option>
                     </select>
                 </form>
             </div>
-            <div class="flex flex-col mt-20">
-                <a class="block w-fit mb-2" href="">New Collection</a>
-                <a class="block w-fit mb-2" href="">All Products</a>
-                <a class="block w-fit mb-2" href="">Discounted Products</a>
+            <div class="mb-6">
+                <h4 class="text-sm font-medium text-gray-600 mb-2">Categories</h4>
+                <div class="flex flex-col gap-2">
+                    <a href="/shop?sortby=newest<%= filter? '&filter='+filter : '' %>" class="<%= !category && !filter && sortby==='newest' ? 'text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' %> transition">New Collection</a>
+                    <a href="/shop?sortby=<%= sortby %><%= filter? '&filter='+filter : '' %>" class="<%= !category && !filter ? 'text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' %> transition">All Products</a>
+                    <a href="/shop?sortby=<%= sortby %>&category=discounted" class="<%= category==='discounted' ? 'text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' %> transition">Discounted Products</a>
+                </div>
             </div>
-            <div class="mt-32">
-                <a class="block w-fit mb-2" href="">Filter by :</a>
-                <a class="block w-fit mb-2" href="">Availability</a>
-                <a class="block w-fit mb-2" href="">Discount</a>
+            <div>
+                <h4 class="text-sm font-medium text-gray-600 mb-2">Filter By</h4>
+                <div class="flex flex-col gap-2">
+                    <a href="/shop?sortby=<%= sortby %><%= category? '&category='+category : '' %>&filter=availability" class="<%= filter==='availability' ? 'text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' %> transition">Availability</a>
+                    <a href="/shop?sortby=<%= sortby %><%= category? '&category='+category : '' %>&filter=discount" class="<%= filter==='discount' ? 'text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' %> transition">Discount</a>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="/shop" class="w-full inline-block text-center px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition duration-150 ease-in-out">
+                    Clear All Filters
+                </a>
             </div>
         </div>
-        <div class="w-[75%] flex flex-col gap-5 h-screen">
-            <div class="flex flex-wrap items-start gap-5">
-                <% products.forEach(function(product){ %>
-                    <div class="w-60">
-                        <div class="w-full h-52 flex items-center justify-center bg-[<%= product.bgcolor %>]">
-                            <img class="h-[12rem]" src="data:image/jpeg;base64,<%= product.image.toString('base64') %>"
-                                alt="">
-                        </div>
-                        <div
-                            class="flex justify-between bg-[<%= product.panelcolor %>] items-center px-4 py-4 text-[<%= product.textcolor %>]">
-                            <div>
-                                <h3>
-                                    <%= product.name %>
-                                </h3>
-                                <h4>₹ <%= product.price %>
-                                </h4>
+        <!-- Products -->
+        <div class="w-full lg:w-3/4">
+            <h2 class="text-2xl font-bold tracking-tight text-gray-800 mb-6">Our Products</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <% products.forEach(function(product) { %>
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg hover:scale-105 transition duration-200 ease-in-out transform">
+                        <div class="relative h-48 flex items-center justify-center bg-[<%= product.bgcolor %>] group">
+                            <img class="h-40 object-contain" src="data:image/jpeg;base64,<%= product.image.toString('base64') %>" alt="<%= product.name %>">
+                            <% if (product.discount > 0) { %>
+                                <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                                    <%= product.discount %>% OFF
+                                </span>
+                            <% } %>
+                            <!-- Quick View overlay -->
+                            <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <button type="button" class="bg-white text-gray-800 px-4 py-2 rounded-lg" 
+                                    data-name="<%= product.name %>" 
+                                    data-price="<%= product.price %>" 
+                                    data-discount="<%= product.discount %>" 
+                                    data-image="data:image/jpeg;base64,<%= product.image.toString('base64') %>"
+                                    onclick="openQuickView(this)">Quick View</button>
                             </div>
-                            <a class="w-7 h-7 flex items-center justify-center rounded-full bg-white text-black shadow-md" href="/addtocart/<%= product._id %>">
+                        </div>
+                        <div class="p-4 bg-[<%= product.panelcolor %>] text-[<%= product.textcolor %>] flex items-center gap-4">
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-lg font-semibold truncate" title="<%= product.name %>"><%= product.name %></h3>
+                                <h4 class="text-base font-medium">₹ <%= product.price - product.discount %></h4>
+                                <% if (product.discount > 0) { %>
+                                    <span class="text-sm text-gray-500 line-through">₹ <%= product.price %></span>
+                                <% } %>
+                            </div>
+                            <a href="/addtocart/<%= product._id %>" class="flex-shrink-0 inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
                                 <i class="ri-add-line text-lg"></i>
                             </a>
                         </div>
                     </div>
-                    <% }) %>
+                <% }) %>
             </div>
         </div>
     </div>
-    <%- include('./partials/footer') %>
+</main>
+
+<!-- Quick View Modal -->
+<div id="quickViewModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg overflow-hidden max-w-md w-full relative">
+        <button class="absolute top-2 right-2 text-gray-600 hover:text-gray-900" onclick="closeQuickView()">&times;</button>
+        <img id="modalImage" src="" alt="" class="w-full h-48 object-contain bg-gray-100">
+        <div class="p-4">
+            <h3 id="modalName" class="text-xl font-semibold"></h3>
+            <p id="modalPrice" class="mt-2 text-lg font-medium text-gray-700"></p>
+            <p id="modalOriginalPrice" class="mt-1 text-sm text-gray-500 line-through"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+function openQuickView(button) {
+    const name = button.getAttribute('data-name');
+    const price = button.getAttribute('data-price');
+    const discount = button.getAttribute('data-discount');
+    const image = button.getAttribute('data-image');
+    document.getElementById('modalName').innerText = name;
+    document.getElementById('modalImage').src = image;
+    const finalPrice = price - discount;
+    document.getElementById('modalPrice').innerText = '₹ ' + finalPrice;
+    document.getElementById('modalOriginalPrice').innerText = discount > 0 ? '₹ ' + price : '';
+    document.getElementById('quickViewModal').classList.remove('hidden');
+}
+function closeQuickView() {
+    document.getElementById('quickViewModal').classList.add('hidden');
+}
+</script>
+
+<%- include('./partials/footer') %>

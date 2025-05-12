@@ -1,24 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Scatch - E-Commerce</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-
-<body class="font-['helvetica_now_display']">
-    <nav class="w-full flex justify-between px-5 py-3">
-        <h3 class="text-xl">Scatch</h3>
+<body class="font-['helvetica_now_display'] bg-gray-50 min-h-screen flex flex-col">
+    <nav class="sticky top-0 z-50 bg-white shadow-md py-4 px-6 flex justify-between items-center">
+        <a href="/" class="text-2xl font-bold text-blue-600">Scatch</a>
         <% var loggedIn = typeof loggedIn !== 'undefined' ? loggedIn : true %>
-        <% if(loggedIn){ %>
-            <div class="flex gap-5 ">
-                <a href="/shop">Shop</a>
-                <a href="/cart">Cart</a>
-                <a href="/profile">My Account</a>
-                <a class="text-red-600" href="/">Logout</a>
+        <% var isOwner = typeof isOwner !== 'undefined' ? isOwner : false %>
+        <% if(loggedIn) { %>
+            <div class="flex items-center gap-6 text-gray-700">
+                <a href="/shop" class="hover:text-blue-600 transition">Shop</a>
+                <a href="/cart" class="hover:text-blue-600 transition">Cart</a>
+                <a href="/profile" class="hover:text-blue-600 transition">My Account</a>
+                <% if(isOwner) { %>
+                    <a href="/owners/admin" class="hover:text-blue-600 transition">Owner Access</a>
+                <% } %>
+                <a href="/logout" class="text-red-500 hover:text-red-600 transition">Logout</a>
+            </div>
+        <% } else { %>
+            <div class="flex items-center gap-6 text-gray-700">
+                <a href="/" class="hover:text-blue-600 transition">Login</a>
+                <a href="/" class="hover:text-blue-600 transition">Register</a>
             </div>
         <% } %>
     </nav>
