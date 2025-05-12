@@ -20,15 +20,55 @@
     </script>
 <% } %>
 
-<% // Set defaults for query params %>
 <% sortby = typeof sortby !== 'undefined' ? sortby : 'popular'; %>
 <% category = typeof category !== 'undefined' ? category : ''; %>
 <% filter = typeof filter !== 'undefined' ? filter : ''; %>
 
-<main class="flex-1 py-12 bg-gray-50">
-    <div class="container mx-auto px-6 lg:px-20 flex flex-col lg:flex-row gap-8">
-        <!-- Sidebar -->
-        <div class="w-full lg:w-1/4 bg-white rounded-xl shadow-md p-6">
+<main class="flex-1 py-8 sm:py-12 bg-gray-50">
+    <!-- Filter & Sort Dropdown for Mobile -->
+    <div id="filter-menu" class="lg:hidden fixed inset-0 bg-white z-50 p-4 overflow-y-auto hidden">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-800">Filter & Sort</h3>
+            <button id="close-filter-btn" class="text-gray-600 hover:text-gray-900">
+                <i class="ri-close-line text-2xl"></i>
+            </button>
+        </div>
+        <div class="mb-4">
+            <h4 class="text-sm font-medium text-gray-600 mb-2">Sort By</h4>
+            <form action="/shop" id="sortFormMobile">
+                <input type="hidden" name="category" value="<%= category %>">
+                <input type="hidden" name="filter" value="<%= filter %>">
+                <select name="sortby" class="w-full border rounded-lg px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out" onchange="document.getElementById('sortFormMobile').submit()">
+                    <option value="popular" <%= sortby==='popular'?'selected':'' %>>Popular</option>
+                    <option value="newest" <%= sortby==='newest'?'selected':'' %>>Newest</option>
+                </select>
+            </form>
+        </div>
+        <div class="mb-4">
+            <h4 class="text-sm font-medium text-gray-600 mb-2">Categories</h4>
+            <div class="flex flex-col gap-2">
+                <a href="/shop?sortby=newest<%= filter? '&filter='+filter : '' %>" class="<%= !category && !filter && sortby==='newest' ? 'text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' %> transition">New Collection</a>
+                <a href="/shop?sortby=<%= sortby %><%= filter? '&filter='+filter : '' %>" class="<%= !category && !filter ? 'text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' %> transition">All Products</a>
+                <a href="/shop?sortby=<%= sortby %>&category=discounted" class="<%= category==='discounted' ? 'text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' %> transition">Discounted Products</a>
+            </div>
+        </div>
+        <div>
+            <h4 class="text-sm font-medium text-gray-600 mb-2">Filter By</h4>
+            <div class="flex flex-col gap-2">
+                <a href="/shop?sortby=<%= sortby %><%= category? '&category='+category : '' %>&filter=availability" class="<%= filter==='availability' ? 'text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' %> transition">Availability</a>
+                <a href="/shop?sortby=<%= sortby %><%= category? '&category='+category : '' %>&filter=discount" class="<%= filter==='discount' ? 'text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' %> transition">Discount</a>
+            </div>
+        </div>
+        <div class="mt-4">
+            <a href="/shop" class="w-full inline-block text-center px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition duration-150 ease-in-out">
+                Clear All Filters
+            </a>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-20 flex flex-col lg:flex-row gap-8 lg:gap-12">
+        <!-- Filter & Sort Sidebar for Desktop -->
+        <div class="hidden lg:block w-full lg:w-1/4 bg-white rounded-xl shadow-md p-6 sm:p-8">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Filter & Sort</h3>
             <div class="mb-6">
                 <h4 class="text-sm font-medium text-gray-600 mb-2">Sort By</h4>
@@ -56,7 +96,7 @@
                     <a href="/shop?sortby=<%= sortby %><%= category? '&category='+category : '' %>&filter=discount" class="<%= filter==='discount' ? 'text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600' %> transition">Discount</a>
                 </div>
             </div>
-            <div class="mt-4">
+            <div class="mt-6">
                 <a href="/shop" class="w-full inline-block text-center px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition duration-150 ease-in-out">
                     Clear All Filters
                 </a>
@@ -64,12 +104,12 @@
         </div>
         <!-- Products -->
         <div class="w-full lg:w-3/4">
-            <h2 class="text-2xl font-bold tracking-tight text-gray-800 mb-6">Our Products</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-gray-800 mb-6 sm:mb-8">Our Products</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                 <% products.forEach(function(product) { %>
                     <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg hover:scale-105 transition duration-200 ease-in-out transform">
-                        <div class="relative h-48 flex items-center justify-center bg-[<%= product.bgcolor %>] group">
-                            <img class="h-40 object-contain" src="data:image/jpeg;base64,<%= product.image.toString('base64') %>" alt="<%= product.name %>">
+                        <div class="relative h-40 sm:h-48 flex items-center justify-center bg-[<%= product.bgcolor %>] group">
+                            <img class="h-32 sm:h-40 object-contain" src="data:image/jpeg;base64,<%= product.image.toString('base64') %>" alt="<%= product.name %>">
                             <% if (product.discount > 0) { %>
                                 <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
                                     <%= product.discount %>% OFF
@@ -77,20 +117,19 @@
                             <% } %>
                             <!-- Quick View overlay -->
                             <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                <button type="button" class="bg-white text-gray-800 px-4 py-2 rounded-lg" 
+                                <button type="button" class="bg-white text-gray-800 px-3 sm:px-4 py-1 sm:py-2 rounded-lg text-sm quick-view-btn" 
                                     data-name="<%= product.name %>" 
                                     data-price="<%= product.price %>" 
                                     data-discount="<%= product.discount %>" 
-                                    data-image="data:image/jpeg;base64,<%= product.image.toString('base64') %>"
-                                    onclick="openQuickView(this)">Quick View</button>
+                                    data-image="data:image/jpeg;base64,<%= product.image.toString('base64') %>">Quick View</button>
                             </div>
                         </div>
-                        <div class="p-4 bg-[<%= product.panelcolor %>] text-[<%= product.textcolor %>] flex items-center gap-4">
+                        <div class="p-3 sm:p-4 bg-[<%= product.panelcolor %>] text-[<%= product.textcolor %>] flex items-center gap-3 sm:gap-4">
                             <div class="flex-1 min-w-0">
-                                <h3 class="text-lg font-semibold truncate" title="<%= product.name %>"><%= product.name %></h3>
-                                <h4 class="text-base font-medium">₹ <%= product.price - product.discount %></h4>
+                                <h3 class="text-base sm:text-lg font-semibold truncate" title="<%= product.name %>"><%= product.name %></h3>
+                                <h4 class="text-sm sm:text-base font-medium">₹ <%= product.price - product.discount %></h4>
                                 <% if (product.discount > 0) { %>
-                                    <span class="text-sm text-gray-500 line-through">₹ <%= product.price %></span>
+                                    <span class="text-xs sm:text-sm text-gray-500 line-through">₹ <%= product.price %></span>
                                 <% } %>
                             </div>
                             <a href="/addtocart/<%= product._id %>" class="flex-shrink-0 inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
@@ -105,34 +144,97 @@
 </main>
 
 <!-- Quick View Modal -->
-<div id="quickViewModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-    <div class="bg-white rounded-lg overflow-hidden max-w-md w-full relative">
-        <button class="absolute top-2 right-2 text-gray-600 hover:text-gray-900" onclick="closeQuickView()">&times;</button>
-        <img id="modalImage" src="" alt="" class="w-full h-48 object-contain bg-gray-100">
+<div id="quickViewModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg overflow-hidden w-11/12 max-w-md relative">
+        <button id="close-quick-view-btn" class="absolute top-2 right-2 text-gray-600 hover:text-gray-900">×</button>
+        <img id="modalImage" src="" alt="" class="w-full h-40 sm:h-48 object-contain bg-gray-100">
         <div class="p-4">
-            <h3 id="modalName" class="text-xl font-semibold"></h3>
-            <p id="modalPrice" class="mt-2 text-lg font-medium text-gray-700"></p>
+            <h3 id="modalName" class="text-lg sm:text-xl font-semibold"></h3>
+            <p id="modalPrice" class="mt-2 text-base sm:text-lg font-medium text-gray-700"></p>
             <p id="modalOriginalPrice" class="mt-1 text-sm text-gray-500 line-through"></p>
         </div>
     </div>
 </div>
 
 <script>
-function openQuickView(button) {
-    const name = button.getAttribute('data-name');
-    const price = button.getAttribute('data-price');
-    const discount = button.getAttribute('data-discount');
-    const image = button.getAttribute('data-image');
-    document.getElementById('modalName').innerText = name;
-    document.getElementById('modalImage').src = image;
-    const finalPrice = price - discount;
-    document.getElementById('modalPrice').innerText = '₹ ' + finalPrice;
-    document.getElementById('modalOriginalPrice').innerText = discount > 0 ? '₹ ' + price : '';
-    document.getElementById('quickViewModal').classList.remove('hidden');
-}
-function closeQuickView() {
-    document.getElementById('quickViewModal').classList.add('hidden');
-}
+    document.addEventListener('DOMContentLoaded', function() {
+        // Hamburger Menu for Filters
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const filterMenu = document.getElementById('filter-menu');
+        const closeFilterBtn = document.getElementById('close-filter-btn');
+
+        if (hamburgerBtn && filterMenu) {
+            hamburgerBtn.addEventListener('click', function() {
+                filterMenu.classList.toggle('hidden');
+                const icon = hamburgerBtn.querySelector('i');
+                icon.classList.toggle('ri-menu-line');
+                icon.classList.toggle('ri-close-line');
+            });
+
+            closeFilterBtn.addEventListener('click', function() {
+                filterMenu.classList.add('hidden');
+                const icon = hamburgerBtn.querySelector('i');
+                icon.classList.remove('ri-close-line');
+                icon.classList.add('ri-menu-line');
+            });
+
+            // Close menu when clicking a filter link
+            filterMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function() {
+                    filterMenu.classList.add('hidden');
+                    const icon = hamburgerBtn.querySelector('i');
+                    icon.classList.remove('ri-close-line');
+                    icon.classList.add('ri-menu-line');
+                });
+            });
+        }
+
+        // Quick View Functionality
+        const quickViewButtons = document.querySelectorAll('.quick-view-btn');
+        const quickViewModal = document.getElementById('quickViewModal');
+        const modalName = document.getElementById('modalName');
+        const modalImage = document.getElementById('modalImage');
+        const modalPrice = document.getElementById('modalPrice');
+        const modalOriginalPrice = document.getElementById('modalOriginalPrice');
+        const closeQuickViewBtn = document.getElementById('close-quick-view-btn');
+
+        // Open Quick View Modal
+        quickViewButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const name = button.getAttribute('data-name');
+                const price = button.getAttribute('data-price');
+                const discount = button.getAttribute('data-discount');
+                const image = button.getAttribute('data-image');
+
+                if (modalName && modalImage && modalPrice && modalOriginalPrice && quickViewModal) {
+                    modalName.innerText = name;
+                    modalImage.src = image;
+                    const finalPrice = parseFloat(price) - parseFloat(discount);
+                    modalPrice.innerText = '₹ ' + finalPrice.toFixed(2);
+                    modalOriginalPrice.innerText = discount > 0 ? '₹ ' + parseFloat(price).toFixed(2) : '';
+                    quickViewModal.classList.remove('hidden');
+                } else {
+                    console.error('Quick View modal elements not found');
+                }
+            });
+        });
+
+        // Close Quick View Modal
+        if (closeQuickViewBtn && quickViewModal) {
+            closeQuickViewBtn.addEventListener('click', function() {
+                quickViewModal.classList.add('hidden');
+            });
+        } else {
+            console.error('Close button or Quick View modal not found');
+        }
+
+        // Optional: Close modal when clicking outside the modal content
+        quickViewModal.addEventListener('click', function(event) {
+            if (event.target === quickViewModal) {
+                quickViewModal.classList.add('hidden');
+            }
+        });
+    });
 </script>
 
 <%- include('./partials/footer') %>

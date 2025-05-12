@@ -8,10 +8,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="font-['helvetica_now_display'] bg-gray-50 min-h-screen flex flex-col">
-    <nav class="sticky top-0 z-50 bg-white shadow-md py-4 px-6 flex justify-between items-center">
-        <a href="/" class="text-2xl font-bold text-blue-600">Scatch</a>
+    <nav class="sticky top-0 z-50 bg-white shadow-md py-4 px-4 sm:px-6 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <a href="/" class="text-2xl font-bold text-blue-600">Scatch</a>
+            <!-- Hamburger Icon for Shop Page Filters (Visible on Mobile) -->
+            <% if (currentPage === 'shop') { %>
+                <button id="hamburger-btn" class="lg:hidden text-gray-600 focus:outline-none">
+                    <i class="ri-menu-line text-2xl"></i>
+                </button>
+            <% } %>
+        </div>
         <!-- Search Bar with Integrated Icon -->
-        <div class="relative flex-1 mx-6">
+        <div class="relative w-full sm:flex-1 sm:mx-6 order-3 sm:order-2">
             <div class="relative flex items-center">
                 <i class="ri-search-line text-lg text-gray-600 absolute left-4"></i>
                 <input 
@@ -29,8 +37,9 @@
         </div>
         <% var loggedIn = typeof loggedIn !== 'undefined' ? loggedIn : true %>
         <% var isOwner = typeof isOwner !== 'undefined' ? isOwner : false %>
-        <% if(loggedIn) { %>
-            <div class="flex items-center gap-6 text-gray-700">
+        <!-- Navigation Links (Always Visible) -->
+        <div class="order-2 sm:order-3 flex flex-wrap items-center gap-3 sm:gap-4 lg:gap-6 text-gray-700 text-sm sm:text-base">
+            <% if(loggedIn) { %>
                 <a href="/shop" class="hover:text-blue-600 transition">Shop</a>
                 <a href="/cart" class="hover:text-blue-600 transition">Cart</a>
                 <a href="/profile" class="hover:text-blue-600 transition">My Account</a>
@@ -38,71 +47,69 @@
                     <a href="/owners/admin" class="hover:text-blue-600 transition">Owner Access</a>
                 <% } %>
                 <a href="/logout" class="text-red-500 hover:text-red-600 transition">Logout</a>
-            </div>
-        <% } else { %>
-            <div class="flex items-center gap-6 text-gray-700">
+            <% } else { %>
                 <a href="/" class="hover:text-blue-600 transition">Login</a>
                 <a href="/" class="hover:text-blue-600 transition">Register</a>
-            </div>
-        <% } %>
+            <% } %>
+        </div>
     </nav>
 
     <!-- JavaScript for Live Search -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Live Search
             const searchBar = document.getElementById('search-bar');
             const suggestionsBox = document.getElementById('search-suggestions');
-
-            searchBar.addEventListener('input', async function() {
-                const query = this.value.trim();
-                if (query.length < 2) {
-                    suggestionsBox.classList.add('hidden');
-                    suggestionsBox.innerHTML = '';
-                    return;
-                }
-
-                try {
-                    const response = await fetch(`/search?query=${encodeURIComponent(query)}`);
-                    const products = await response.json();
-
-                    suggestionsBox.innerHTML = '';
-                    if (products.length === 0) {
-                        suggestionsBox.innerHTML = '<div class="p-3 text-gray-600">No products found</div>';
-                    } else {
-                        products.forEach(product => {
-                            const suggestionItem = document.createElement('a');
-                            suggestionItem.href = `/shop?search=${encodeURIComponent(product.name)}`;
-                            suggestionItem.className = 'flex items-center p-3 hover:bg-gray-100 transition duration-150 ease-in-out';
-                            suggestionItem.innerHTML = `
-                                <img src="data:image/jpeg;base64,${product.image}" alt="${product.name}" class="w-10 h-10 object-contain mr-3">
-                                <div>
-                                    <p class="text-gray-800 font-medium">${product.name}</p>
-                                    <p class="text-gray-600 text-sm">₹ ${product.price - product.discount}</p>
-                                </div>
-                            `;
-                            suggestionsBox.appendChild(suggestionItem);
-                        });
+            if (searchBar) {
+                searchBar.addEventListener('input', async function() {
+                    const query = this.value.trim();
+                    if (query.length < 2) {
+                        suggestionsBox.classList.add('hidden');
+                        suggestionsBox.innerHTML = '';
+                        return;
                     }
-                    suggestionsBox.classList.remove('hidden');
-                } catch (error) {
-                    console.error('Error fetching search suggestions:', error);
-                    suggestionsBox.classList.add('hidden');
-                }
-            });
 
-            // Hide suggestions when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!searchBar.contains(e.target) && !suggestionsBox.contains(e.target)) {
-                    suggestionsBox.classList.add('hidden');
-                }
-            });
+                    try {
+                        const response = await fetch(`/search?query=${encodeURIComponent(query)}`);
+                        const products = await response.json();
 
-            // Show suggestions again when clicking the search bar
-            searchBar.addEventListener('focus', function() {
-                if (this.value.trim().length >= 2) {
-                    suggestionsBox.classList.remove('hidden');
-                }
-            });
+                        suggestionsBox.innerHTML = '';
+                        if (products.length === 0) {
+                            suggestionsBox.innerHTML = '<div class="p-3 text-gray-600">No products found</div>';
+                        } else {
+                            products.forEach(product => {
+                                const suggestionItem = document.createElement('a');
+                                suggestionItem.href = `/shop?search=${encodeURIComponent(product.name)}`;
+                                suggestionItem.className = 'flex items-center p-3 hover:bg-gray-100 transition duration-150 ease-in-out';
+                                suggestionItem.innerHTML = `
+                                    <img src="data:image/jpeg;base64,${product.image}" alt="${product.name}" class="w-10 h-10 object-contain mr-3">
+                                    <div>
+                                        <p class="text-gray-800 font-medium">${product.name}</p>
+                                        <p class="text-gray-600 text-sm">₹ ${product.price - product.discount}</p>
+                                    </div>
+                                `;
+                                suggestionsBox.appendChild(suggestionItem);
+                            });
+                        }
+                        suggestionsBox.classList.remove('hidden');
+                    } catch (error) {
+                        console.error('Error fetching search suggestions:', error);
+                        suggestionsBox.classList.add('hidden');
+                    }
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!searchBar.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                        suggestionsBox.classList.add('hidden');
+                    }
+                });
+
+                searchBar.addEventListener('focus', function() {
+                    if (this.value.trim().length >= 2) {
+                        suggestionsBox.classList.remove('hidden');
+                    }
+                });
+            }
         });
     </script>
 </body>
