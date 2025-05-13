@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const expressSession = require('express-session') // session management
+const passport = require('passport') // passport for authentication
 const flash = require('connect-flash') // flash messages
 const fileUpload = require('express-fileupload') // file upload middleware
 const port = 3000
@@ -29,6 +30,13 @@ app.use(expressSession({
     saveUninitialized: false,
     secret: process.env.EXPRESS_SESSION_SECRET,
 })) // We need express-session to use flash messages. It helps to create a session for the user.
+
+// Initialize Passport and use session for persistent login
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Configure Passport strategies
+require('./config/passport')(passport);
 
 app.use(flash()) // flash messages middleware
 app.use(fileUpload({

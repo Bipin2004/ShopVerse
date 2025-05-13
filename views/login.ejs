@@ -101,16 +101,15 @@
                             <div class="relative flex items-center justify-center mt-4">
                                 <div class="h-px bg-gray-300 absolute left-0 right-0"></div>
                                 <span class="px-3 bg-white text-sm text-gray-500 relative">Or continue with</span>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <button type="button" class="py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none flex items-center justify-center">
+                            </div>                            <div class="grid grid-cols-2 gap-4">
+                                <a href="/users/auth/google" class="py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none flex items-center justify-center transition-all">
                                     <i class="ri-google-fill text-lg mr-2 text-red-500"></i>
                                     <span>Google</span>
-                                </button>
-                                <button type="button" class="py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none flex items-center justify-center">
+                                </a>
+                                <a href="/users/auth/facebook" class="py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none flex items-center justify-center transition-all">
                                     <i class="ri-facebook-fill text-lg mr-2 text-blue-600"></i>
                                     <span>Facebook</span>
-                                </button>
+                                </a>
                             </div>
                         </form>
                     </div>
@@ -159,12 +158,26 @@
                             <div class="flex items-center">
                                 <input id="terms" name="terms" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" required>
                                 <label for="terms" class="ml-2 block text-sm text-gray-700">I agree to the <a href="#" class="text-blue-600 hover:text-blue-800">Terms of Service</a> and <a href="#" class="text-blue-600 hover:text-blue-800">Privacy Policy</a></label>
-                            </div>
-                            <button
+                            </div>                            <button
                                 class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg shadow-md hover:shadow-lg transition duration-300 font-semibold text-base flex items-center justify-center"
                                 type="submit">
                                 <i class="ri-user-add-line mr-2"></i> Create Account
                             </button>
+                            
+                            <div class="relative flex items-center justify-center mt-4">
+                                <div class="h-px bg-gray-300 absolute left-0 right-0"></div>
+                                <span class="px-3 bg-white text-sm text-gray-500 relative">Or register with</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 mt-4">
+                                <a href="/users/auth/google" class="py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none flex items-center justify-center transition-all">
+                                    <i class="ri-google-fill text-lg mr-2 text-red-500"></i>
+                                    <span>Google</span>
+                                </a>
+                                <a href="/users/auth/facebook" class="py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none flex items-center justify-center transition-all">
+                                    <i class="ri-facebook-fill text-lg mr-2 text-blue-600"></i>
+                                    <span>Facebook</span>
+                                </a>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -173,12 +186,39 @@
     </div>
 </main>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
+<script>    document.addEventListener('DOMContentLoaded', function() {
         const loginTab = document.getElementById('login-tab');
         const registerTab = document.getElementById('register-tab');
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
+        
+        // Add loading state to social login buttons
+        const socialButtons = document.querySelectorAll('[href^="/users/auth/"]');
+        socialButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                // Visual feedback when clicking social login buttons
+                this.classList.add('opacity-75');
+                const icon = this.querySelector('i');
+                const text = this.querySelector('span');
+                
+                // Store original text
+                const originalText = text.textContent;
+                const originalIcon = icon.className;
+                
+                // Change to loading state
+                icon.className = 'ri-loader-4-line animate-spin mr-2';
+                text.textContent = 'Connecting...';
+                
+                // Reset if taking too long (fallback)
+                setTimeout(() => {
+                    if (document.body.contains(this)) {
+                        this.classList.remove('opacity-75');
+                        icon.className = originalIcon;
+                        text.textContent = originalText;
+                    }
+                }, 8000);
+            });
+        });
         
         loginTab.addEventListener('click', function() {
             // Activate login tab

@@ -21,7 +21,14 @@ const userSchema = mongoose.Schema({
     isOwner : {
         type : Boolean,
         default : false
-    }
+    },
+    authType: {
+        type: String,
+        enum: ['local', 'google', 'facebook'],
+        default: 'local'
+    },
+    googleId: String,
+    facebookId: String
 })
 
 module.exports = mongoose.model('user', userSchema)

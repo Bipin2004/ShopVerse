@@ -1,109 +1,265 @@
 <%- include('./partials/header') %>
 
-<main class="flex-1 py-8 sm:py-12 bg-gray-50">
+<main class="flex-1 py-8 sm:py-12 bg-gradient-to-br from-blue-50 to-indigo-50">
     <div class="container mx-auto px-4 sm:px-6 lg:px-20">
-        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4">
-            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">My Account</h2>
-            <a href="/shop" class="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-center">Continue Shopping</a>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-            <!-- Profile Information -->
-            <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
-                <h3 class="text-lg sm:text-xl font-semibold text-blue-600 mb-4">Personal Information</h3>
-                <div class="space-y-3 text-sm sm:text-base">
-                    <p class="flex justify-between">
-                        <span class="text-gray-600">Name:</span>
-                        <span class="font-medium truncate"><%= user.fullname %></span>
-                    </p>
-                    <p class="flex justify-between">
-                        <span class="text-gray-600">Email:</span>
-                        <span class="font-medium truncate"><%= user.email %></span>
-                    </p>
-                    <% if (user.contact) { %>
-                        <p class="flex justify-between">
-                            <span class="text-gray-600">Contact:</span>
-                            <span class="font-medium"><%= user.contact %></span>
-                        </p>
-                    <% } %>
-                </div>
-                <button class="mt-4 sm:mt-6 px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition text-xs sm:text-sm">Edit Information</button>
+        <!-- Profile Header with Banner -->
+        <div class="relative bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg mb-8 overflow-hidden">
+            <div class="absolute inset-0 opacity-10">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" class="w-full h-full">
+                    <path d="M769 229L1037 260.9M927 880L731 737 520 660 309 538 40 599 295 764 126.5 879.5 40 599-197 493 102 382-31 229 126.5 79.5-69-63" stroke-width="100" stroke="white" fill="none"></path>
+                </svg>
             </div>
-            <!-- Shopping Summary -->
-            <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
-                <h3 class="text-lg sm:text-xl font-semibold text-blue-600 mb-4">Shopping Summary</h3>
-                <div class="space-y-3 text-sm sm:text-base">
-                    <p class="flex justify-between">
-                        <span class="text-gray-600">Items in Cart:</span>
-                        <span class="font-medium"><%= user.cart ? user.cart.length : 0 %></span>
-                    </p>
-                    <p class="flex justify-between">
-                        <span class="text-gray-600">Completed Orders:</span>
-                        <span class="font-medium"><%= user.orders ? user.orders.length : 0 %></span>
-                    </p>
+            <div class="relative flex flex-col sm:flex-row items-center justify-between p-6 sm:p-8 gap-4">
+                <div class="flex items-center gap-5">
+                    <div class="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white flex items-center justify-center shadow-lg">
+                        <span class="text-2xl sm:text-3xl font-bold text-blue-600"><%= user.fullname?.charAt(0).toUpperCase() || 'U' %></span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl sm:text-3xl font-bold text-white">Welcome, <%= user.fullname?.split(' ')[0] || 'User' %>!</h1>
+                        <p class="text-blue-100">Member since <%= new Date().toLocaleDateString('en-US', {year: 'numeric', month: 'long'}) %></p>
+                    </div>
                 </div>
-                <a href="/cart" class="mt-4 sm:mt-6 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-xs sm:text-sm">View Cart</a>
-            </div>
-            <!-- Account Actions -->
-            <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
-                <h3 class="text-lg sm:text-xl font-semibold text-blue-600 mb-4">Account Actions</h3>
-                <div class="space-y-3 sm:space-y-4 text-sm sm:text-base">
-                    <a href="#" class="flex items-center text-gray-700 hover:text-blue-600 transition">
-                        <i class="ri-lock-line mr-2"></i>
-                        <span>Change Password</span>
-                    </a>
-                    <a href="#" class="flex items-center text-gray-700 hover:text-blue-600 transition">
-                        <i class="ri-map-pin-line mr-2"></i>
-                        <span>Manage Addresses</span>
-                    </a>
-                    <a href="#" class="flex items-center text-gray-700 hover:text-blue-600 transition">
-                        <i class="ri-heart-line mr-2"></i>
-                        <span>Wishlist</span>
-                    </a>
-                    <a href="/logout" class="flex items-center text-red-500 hover:text-red-600 transition">
-                        <i class="ri-logout-box-line mr-2"></i>
-                        <span>Logout</span>
-                    </a>
-                </div>
+                <a href="/shop" class="w-full sm:w-auto px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition shadow-md flex items-center justify-center gap-2">
+                    <i class="ri-store-2-line"></i>
+                    <span>Continue Shopping</span>
+                </a>
             </div>
         </div>
-        <% if (user.orders && user.orders.length > 0) { %>
-            <!-- Order History -->
-            <div class="mt-8 sm:mt-12">
-                <h3 class="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Order History</h3>
-                <div class="bg-white rounded-xl shadow-md overflow-x-auto">
-                    <table class="w-full min-w-[640px]">
-                        <thead class="bg-gray-100">
-                            <tr>
-                                <th class="py-3 sm:py-4 px-4 sm:px-6 text-left text-gray-600 text-sm sm:text-base">Order ID</th>
-                                <th class="py-3 sm:py-4 px-4 sm:px-6 text-left text-gray-600 text-sm sm:text-base">Date</th>
-                                <th class="py-3 sm:py-4 px-4 sm:px-6 text-left text-gray-600 text-sm sm:text-base">Items</th>
-                                <th class="py-3 sm:py-4 px-4 sm:px-6 text-left text-gray-600 text-sm sm:text-base">Total</th>
-                                <th class="py-3 sm:py-4 px-4 sm:px-6 text-left text-gray-600 text-sm sm:text-base">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% user.orders.forEach(order => { %>
-                                <tr class="border-t border-gray-200 hover:bg-gray-50">
-                                    <td class="py-3 sm:py-4 px-4 sm:px-6 text-sm sm:text-base">#<%= order.id %></td>
-                                    <td class="py-3 sm:py-4 px-4 sm:px-6 text-sm sm:text-base"><%= order.date %></td>
-                                    <td class="py-3 sm:py-4 px-4 sm:px-6 text-sm sm:text-base"><%= order.items.length %></td>
-                                    <td class="py-3 sm:py-4 px-4 sm:px-6 text-sm sm:text-base">₹ <%= order.total %></td>
-                                    <td class="py-3 sm:py-4 px-4 sm:px-6">
-                                        <span class="px-2 py-1 rounded-full text-xs sm:text-sm 
-                                            <%= order.status === 'Delivered' ? 'bg-green-100 text-green-800' : 
-                                               order.status === 'Processing' ? 'bg-blue-100 text-blue-800' : 
-                                               'bg-yellow-100 text-yellow-800' %>">
-                                            <%= order.status %>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8">
+            <!-- Left Column -->
+            <div class="lg:col-span-1">
+                <!-- User Stats Card -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6 border border-blue-100">
+                    <div class="bg-gradient-to-r from-blue-500 to-indigo-500 p-4">
+                        <h3 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                            <i class="ri-user-3-line"></i>
+                            <span>Profile Overview</span>
+                        </h3>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex flex-col gap-4">
+                            <!-- Profile Completeness -->
+                            <div>
+                                <div class="flex justify-between mb-1 text-sm">
+                                    <span class="text-gray-700">Profile Completeness</span>
+                                    <span class="text-blue-600 font-semibold">80%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: 80%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Stats -->
+                            <div class="grid grid-cols-2 gap-3 pt-2">
+                                <div class="bg-blue-50 p-3 rounded-lg text-center">
+                                    <div class="text-2xl sm:text-3xl font-bold text-blue-600"><%= user.cart ? user.cart.length : 0 %></div>
+                                    <div class="text-xs sm:text-sm text-blue-800">Items in Cart</div>
+                                </div>
+                                <div class="bg-indigo-50 p-3 rounded-lg text-center">
+                                    <div class="text-2xl sm:text-3xl font-bold text-indigo-600"><%= user.orders ? user.orders.length : 0 %></div>
+                                    <div class="text-xs sm:text-sm text-indigo-800">Orders</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <a href="/cart" class="flex items-center justify-center w-full px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 transition shadow-sm">
+                                <i class="ri-shopping-cart-2-line mr-2"></i>
+                                <span>View Cart</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Account Actions -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-blue-100">
+                    <div class="bg-gradient-to-r from-blue-500 to-indigo-500 p-4">
+                        <h3 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                            <i class="ri-settings-4-line"></i>
+                            <span>Account Actions</span>
+                        </h3>
+                    </div>
+                    <div class="p-4">
+                        <div class="space-y-1">
+                            <a href="#" class="flex items-center p-3 rounded-lg hover:bg-blue-50 transition">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                    <i class="ri-lock-line text-blue-600"></i>
+                                </div>
+                                <span class="text-gray-800 font-medium">Change Password</span>
+                            </a>
+                            <a href="#" class="flex items-center p-3 rounded-lg hover:bg-blue-50 transition">
+                                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                    <i class="ri-map-pin-line text-green-600"></i>
+                                </div>
+                                <span class="text-gray-800 font-medium">Manage Addresses</span>
+                            </a>
+                            <a href="#" class="flex items-center p-3 rounded-lg hover:bg-blue-50 transition">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                                    <i class="ri-heart-line text-purple-600"></i>
+                                </div>
+                                <span class="text-gray-800 font-medium">Wishlist</span>
+                            </a>
+                            <a href="/logout" class="flex items-center p-3 rounded-lg hover:bg-red-50 transition">
+                                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                                    <i class="ri-logout-box-line text-red-600"></i>
+                                </div>
+                                <span class="text-red-600 font-medium">Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="lg:col-span-3">
+                <!-- Personal Information Card -->
+                <div class="bg-white rounded-xl shadow-md border border-blue-100 mb-6 sm:mb-8">
+                    <div class="bg-gradient-to-r from-blue-500 to-indigo-500 p-4 flex justify-between items-center">
+                        <h3 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                            <i class="ri-profile-line"></i>
+                            <span>Personal Information</span>
+                        </h3>
+                        <button class="px-4 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg transition text-sm flex items-center gap-1">
+                            <i class="ri-edit-line"></i>
+                            <span>Edit</span>
+                        </button>
+                    </div>
+                    <div class="p-5">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500 mb-1">Full Name</label>
+                                    <div class="text-lg font-medium text-gray-800 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                        <%= user.fullname %>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500 mb-1">Email Address</label>
+                                    <div class="text-lg font-medium text-gray-800 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                        <%= user.email %>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <% if (user.contact) { %>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500 mb-1">Contact Number</label>
+                                    <div class="text-lg font-medium text-gray-800 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                        <%= user.contact %>
+                                    </div>
+                                </div>
+                                <% } %>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500 mb-1">Account Type</label>
+                                    <div class="text-lg font-medium flex items-center gap-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                        <span class="px-2 py-1 bg-<%= isOwner ? 'purple-100' : 'blue-100' %> text-<%= isOwner ? 'purple-700' : 'blue-700' %> rounded-md text-sm">
+                                            <%= isOwner ? 'Admin User' : 'Standard User' %>
                                         </span>
-                                    </td>
-                                </tr>
-                            <% }) %>
-                        </tbody>
-                    </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                <!-- Order History Card -->
+                <% if (user.orders && user.orders.length > 0) { %>
+                <div class="bg-white rounded-xl shadow-md border border-blue-100">
+                    <div class="bg-gradient-to-r from-blue-500 to-indigo-500 p-4 flex justify-between items-center">
+                        <h3 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                            <i class="ri-file-list-3-line"></i>
+                            <span>Order History</span>
+                        </h3>
+                        <div class="px-3 py-1.5 bg-white/20 text-white rounded-lg text-sm">
+                            <%= user.orders.length %> Orders
+                        </div>
+                    </div>
+                    <div class="p-0 sm:p-1">
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-[640px]">
+                                <thead class="bg-blue-50">
+                                    <tr>
+                                        <th class="py-3.5 px-4 sm:px-6 text-left text-indigo-800 font-semibold text-sm sm:text-base border-b border-blue-100">Order ID</th>
+                                        <th class="py-3.5 px-4 sm:px-6 text-left text-indigo-800 font-semibold text-sm sm:text-base border-b border-blue-100">Date</th>
+                                        <th class="py-3.5 px-4 sm:px-6 text-left text-indigo-800 font-semibold text-sm sm:text-base border-b border-blue-100">Items</th>
+                                        <th class="py-3.5 px-4 sm:px-6 text-left text-indigo-800 font-semibold text-sm sm:text-base border-b border-blue-100">Total</th>
+                                        <th class="py-3.5 px-4 sm:px-6 text-left text-indigo-800 font-semibold text-sm sm:text-base border-b border-blue-100">Status</th>
+                                        <th class="py-3.5 px-4 sm:px-6 text-left text-indigo-800 font-semibold text-sm sm:text-base border-b border-blue-100">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% user.orders.forEach((order, index) => { %>
+                                        <tr class="<%= index % 2 === 0 ? 'bg-white' : 'bg-blue-50/30' %> hover:bg-blue-50 transition">
+                                            <td class="py-3.5 px-4 sm:px-6 text-sm sm:text-base font-medium text-blue-700">#<%= order.id %></td>
+                                            <td class="py-3.5 px-4 sm:px-6 text-sm sm:text-base text-gray-800"><%= order.date %></td>
+                                            <td class="py-3.5 px-4 sm:px-6 text-sm sm:text-base text-gray-800">
+                                                <span class="w-8 h-8 inline-flex items-center justify-center bg-blue-100 text-blue-800 rounded-full"><%= order.items.length %></span>
+                                            </td>
+                                            <td class="py-3.5 px-4 sm:px-6 text-sm sm:text-base font-medium text-gray-800">₹ <%= order.total %></td>
+                                            <td class="py-3.5 px-4 sm:px-6">
+                                                <span class="px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium inline-flex items-center gap-1
+                                                    <%= order.status === 'Delivered' ? 'bg-green-100 text-green-800' : 
+                                                       order.status === 'Processing' ? 'bg-blue-100 text-blue-800' : 
+                                                       'bg-yellow-100 text-yellow-800' %>">
+                                                    <div class="w-2 h-2 rounded-full <%= order.status === 'Delivered' ? 'bg-green-500' : 
+                                                       order.status === 'Processing' ? 'bg-blue-500' : 
+                                                       'bg-yellow-500' %>"></div>
+                                                    <%= order.status %>
+                                                </span>
+                                            </td>
+                                            <td class="py-3.5 px-4 sm:px-6">
+                                                <button class="text-blue-600 hover:text-blue-800 font-medium text-sm transition">View Details</button>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
+                <% } else { %>
+                    <!-- No Orders Card -->
+                    <div class="bg-white rounded-xl shadow-md border border-blue-100 p-6 text-center">
+                        <div class="w-16 h-16 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                            <i class="ri-shopping-bag-line text-2xl text-blue-500"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">No Orders Yet</h3>
+                        <p class="text-gray-600 mb-4">You haven't placed any orders yet. Start shopping to see your orders here!</p>
+                        <a href="/shop" class="inline-flex items-center justify-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition shadow-sm">
+                            <i class="ri-shopping-cart-line mr-2"></i>
+                            <span>Shop Now</span>
+                        </a>
+                    </div>
+                <% } %>
             </div>
-        <% } %>
+        </div>
     </div>
 </main>
+
+<!-- Add JavaScript at the end for interaction -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Example animation for profile stats
+    const animateNumbers = () => {
+        const statsElements = document.querySelectorAll('.bg-blue-50 .text-2xl, .bg-indigo-50 .text-2xl');
+        statsElements.forEach(el => {
+            const finalValue = parseInt(el.textContent);
+            let currentValue = 0;
+            const increment = Math.max(1, Math.floor(finalValue / 15));
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if(currentValue > finalValue) {
+                    currentValue = finalValue;
+                    clearInterval(timer);
+                }
+                el.textContent = currentValue;
+            }, 30);
+        });
+    };
+    
+    // Run animation after a short delay
+    setTimeout(animateNumbers, 300);
+});
+</script>
 
 <%- include('./partials/footer') %>
