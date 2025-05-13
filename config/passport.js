@@ -1,6 +1,5 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const FacebookStrategy = require('passport-facebook').Strategy;
 const User = require('../models/users');
 
 // Configure Passport
@@ -57,55 +56,5 @@ module.exports = function(passport) {
           return done(err, null);
         }
       }
-    )
-  );
-
-  // Facebook OAuth Strategy
-  passport.use(
-    new FacebookStrategy(
-      {
-        clientID: process.env.FACEBOOK_APP_ID,
-        clientSecret: process.env.FACEBOOK_APP_SECRET,
-        callbackURL: '/users/auth/facebook/callback',
-        profileFields: ['id', 'displayName', 'email'],
-        proxy: true
-      },
-      async (accessToken, refreshToken, profile, done) => {
-        try {
-          // Check if user has email (Facebook might not always provide email)
-          const email = profile.emails && profile.emails[0] ? profile.emails[0].value : `${profile.id}@facebook.com`;
-          
-          // Check if user already exists
-          let user = await User.findOne({ 
-            $or: [
-              { email: email },
-              { facebookId: profile.id }
-            ]
-          });
-          
-          if (user) {
-            // User exists, return user
-            return done(null, user);
-          } else {
-            // Create new user
-            const newUser = new User({
-              fullname: profile.displayName,
-              email: email,
-              // Generate random password for OAuth users
-              password: Math.random().toString(36).slice(-8),
-              authType: 'facebook',
-              facebookId: profile.id
-            });
-            
-            // Save user
-            await newUser.save();
-            return done(null, newUser);
-          }
-        } catch (err) {
-          console.error('Error in Facebook auth:', err);
-          return done(err, null);
-        }
-      }
-    )
-  );
+    )  );
 };

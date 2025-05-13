@@ -28,20 +28,6 @@ router.get('/auth/google/callback',
     }
 );
 
-// Facebook OAuth Routes
-router.get('/auth/facebook', 
-    passport.authenticate('facebook', { scope: ['email'] })
-);
 
-router.get('/auth/facebook/callback', 
-    passport.authenticate('facebook', { 
-        failureRedirect: '/login', 
-        failureFlash: true 
-    }),
-    function(req, res) {
-        // Successful authentication, redirect to profile
-        res.redirect('/profile');
-    }
-);
 
 module.exports = router

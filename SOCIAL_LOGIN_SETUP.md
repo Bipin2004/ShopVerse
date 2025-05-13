@@ -6,7 +6,7 @@ This document explains how to finalize the social login setup for your ShopVerse
 
 To make social login work, you need to:
 
-1. Register your application with Google and Facebook developer platforms
+1. Register your application with the Google developer platform
 2. Update your environment variables with the correct credentials
 
 ## Google OAuth Setup
@@ -19,15 +19,7 @@ To make social login work, you need to:
    - Add your production URL when deploying
 5. Copy the Client ID and Client Secret
 
-## Facebook OAuth Setup
 
-1. Go to [Facebook Developers](https://developers.facebook.com/)
-2. Create a new app
-3. Add Facebook Login product
-4. Configure the Valid OAuth Redirect URIs:
-   - `http://localhost:3000/users/auth/facebook/callback` (for development)
-   - Add your production URL when deploying
-5. Copy the App ID and App Secret
 
 ## Update Environment Variables
 
@@ -37,10 +29,6 @@ Update your `.env` file with the real credentials:
 # Google OAuth
 GOOGLE_CLIENT_ID=your_actual_google_client_id
 GOOGLE_CLIENT_SECRET=your_actual_google_client_secret
-
-# Facebook OAuth
-FACEBOOK_APP_ID=your_actual_facebook_app_id
-FACEBOOK_APP_SECRET=your_actual_facebook_app_secret
 ```
 
 ## Usage
