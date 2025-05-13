@@ -229,12 +229,10 @@ router.post('/admin/edit/:productId', isLoggedIn, isOwner, async (req, res) => {
         // Validate required fields
         if (!name || !price || !discount) {
             return res.status(400).json({ error: 'Name, price, and discount are required' });
-        }
-
-        const updateData = {
+        }        const updateData = {
             name,
             price: Number(price),
-            discount: Number(discount),
+            discount: (Number(discount) / 100) * Number(price), // Calculate discount amount from percentage
             bgcolor: bgcolor || '#ffffff',
             panelcolor: panelcolor || '#ffffff',
             textcolor: textcolor || '#000000'

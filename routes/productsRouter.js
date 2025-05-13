@@ -12,13 +12,11 @@ router.post('/create', isLoggedIn, isOwner, async (req, res) => {
         if (!name || !price || !discount) {
             req.flash('error', 'Name, price, and discount are required');
             return res.redirect('/owners/admin');
-        }
-
-        // Create product data
+        }        // Create product data
         const productData = {
             name,
             price: Number(price),
-            discount: Number(discount),
+            discount: (Number(discount) / 100) * Number(price), // Calculate discount amount from percentage
             bgcolor: bgcolor || '#ffffff',
             panelcolor: panelcolor || '#ffffff',
             textcolor: textcolor || '#000000'

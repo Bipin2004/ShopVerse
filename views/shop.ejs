@@ -112,7 +112,7 @@
                             <img class="h-32 sm:h-40 object-contain" src="data:image/jpeg;base64,<%= product.image %>" alt="<%= product.name %>">
                             <% if (product.discount > 0) { %>
                                 <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                                    <%= product.discount %>% OFF
+                                    <%= Math.round((product.discount / product.price) * 100) %>% OFF
                                 </span>
                             <% } %>
                             <!-- Quick View overlay -->
@@ -212,6 +212,8 @@
                     const finalPrice = parseFloat(price) - parseFloat(discount);
                     modalPrice.innerText = '₹ ' + finalPrice.toFixed(2);
                     modalOriginalPrice.innerText = discount > 0 ? '₹ ' + parseFloat(price).toFixed(2) : '';
+                    // Show discount percentage
+                    const discountPercentage = parseFloat(discount) > 0 ? Math.round((parseFloat(discount) / parseFloat(price)) * 100) + '% OFF' : '';
                     quickViewModal.classList.remove('hidden');
                 } else {
                     console.error('Quick View modal elements not found');
