@@ -1,6 +1,4 @@
-/* Custom CSS for ShopVerse */
 
-/* Product Card Hover Effect */
 .product-card {
     transition: all 0.3s ease;
 }
@@ -9,7 +7,6 @@
     transform: translateY(-8px);
 }
 
-/* Shimmer Effect for CTA sections */
 .shimmer {
     position: relative;
     overflow: hidden;
@@ -35,7 +32,6 @@
     }
 }
 
-/* Pulse Animation for New Items */
 .pulse {
     animation: pulse-animation 2s infinite;
 }
@@ -52,7 +48,7 @@
     }
 }
 
-/* Badge Animation */
+
 .badge-animation {
     animation: badge-pulse 1.5s infinite alternate;
 }
@@ -66,7 +62,6 @@
     }
 }
 
-/* Improved Scroll Behavior */
 html {
     scroll-behavior: smooth;
 }
@@ -91,7 +86,7 @@ html {
     background: #4338CA;
 }
 
-/* Image Zoom Effect */
+
 .zoom-effect {
     overflow: hidden;
 }
