@@ -109,7 +109,7 @@
                 <% products.forEach(function(product) { %>
                     <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg hover:scale-105 transition duration-200 ease-in-out transform">
                         <div class="relative h-40 sm:h-48 flex items-center justify-center bg-[<%= product.bgcolor %>] group">
-                            <img class="h-32 sm:h-40 object-contain" src="data:image/jpeg;base64,<%= product.image.toString('base64') %>" alt="<%= product.name %>">
+                            <img class="h-32 sm:h-40 object-contain" src="data:image/jpeg;base64,<%= product.image %>" alt="<%= product.name %>">
                             <% if (product.discount > 0) { %>
                                 <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
                                     <%= product.discount %>% OFF
@@ -121,7 +121,7 @@
                                     data-name="<%= product.name %>" 
                                     data-price="<%= product.price %>" 
                                     data-discount="<%= product.discount %>" 
-                                    data-image="data:image/jpeg;base64,<%= product.image.toString('base64') %>">Quick View</button>
+                                    data-image="data:image/jpeg;base64,<%= product.image %>">Quick View</button>
                             </div>
                         </div>
                         <div class="p-3 sm:p-4 bg-[<%= product.panelcolor %>] text-[<%= product.textcolor %>] flex items-center gap-3 sm:gap-4">

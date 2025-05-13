@@ -4,14 +4,43 @@ const isLoggedIn = require('../middlewares/isLoggedIn')
 const productModel = require('../models/product')
 const userModel = require('../models/users')
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     let error = req.flash('error')
     let loggedIn = !!req.cookies.token
     let isOwner = false
+    let previewProducts = []
+    try {
+        // Fetch 3 products for preview, sorted by newest
+        previewProducts = await productModel.find().sort({ _id: -1 }).limit(3)
+        
+        // Convert Buffer images to base64 strings
+        previewProducts = previewProducts.map(product => {
+            const productObj = product.toObject()
+            if (productObj.image) {
+                productObj.image = productObj.image.toString('base64')
+            }
+            return productObj
+        })
+    } catch (err) {
+        console.error('Error fetching preview products:', err.message)
+    }
     if (loggedIn && req.user) {
         isOwner = req.user.isOwner || false
     }
-    res.render('index', { error, loggedIn, isOwner, currentPage: 'index' })
+    res.render('index', { error, loggedIn, isOwner, previewProducts, currentPage: 'home' })
+})
+
+router.get('/login', async (req, res) => {
+    let error = req.flash('error')
+    let loggedIn = !!req.cookies.token
+    let isOwner = false
+    
+    if (loggedIn && req.user) {
+        isOwner = req.user.isOwner || false
+        return res.redirect('/shop')
+    }
+    
+    res.render('login', { error, loggedIn, isOwner, currentPage: 'login' })
 })
 
 router.get('/profile', isLoggedIn, async (req, res) => {
@@ -48,7 +77,16 @@ router.get('/shop', isLoggedIn, async (req, res) => {
             productQuery.sort({ discount: -1 });
         }
 
-        const products = await productQuery;
+        let products = await productQuery;
+        // Convert products to plain objects and transform the image Buffer to base64
+        products = products.map(product => {
+            const productObj = product.toObject();
+            if (productObj.image) {
+                productObj.image = productObj.image.toString('base64');
+            }
+            return productObj;
+        });
+        
         const isOwner = req.user.isOwner || false;
         const success = req.flash('success');
         res.render('shop', { products, success, isOwner, sortby, category, filter, currentPage: 'shop' });
@@ -97,14 +135,24 @@ router.get('/addtocart/:productid', isLoggedIn, async (req, res) => {
 router.get('/cart', isLoggedIn, async (req, res) => {
     let user = await userModel.findOne({email: req.user.email}).populate('cart')
     let bill = 0;
-    if (user.cart && user.cart.length > 0) {
-        user.cart.forEach(item => {
+    
+    // Convert user object to a plain object to manipulate
+    const userObj = user.toObject();
+    
+    if (userObj.cart && userObj.cart.length > 0) {
+        userObj.cart.forEach(item => {
+            // Convert image buffer to base64 string
+            if (item.image) {
+                item.image = item.image.toString('base64');
+            }
+            
             bill += Number(item.price) - Number(item.discount);
         });
         bill += 20;
     }
+    
     const isOwner = req.user.isOwner || false
-    res.render('cart', { user, bill, isOwner, currentPage: 'cart' })
+    res.render('cart', { user: userObj, bill, isOwner, currentPage: 'cart' })
 })
 
 router.post('/update-cart-quantity/:productId/:quantity', isLoggedIn, async (req, res) => {
